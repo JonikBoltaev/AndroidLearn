@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+    // Создание даты
     private fun setupListViewWithArrayAdapter() {
         val data = mutableListOf(
             Character(id = UUID.randomUUID().toString(), name = "Sven"),
@@ -33,6 +35,7 @@ class MainActivity : AppCompatActivity() {
             Character(id = UUID.randomUUID().toString(), name = "Faceless void"),
             Character(id = UUID.randomUUID().toString(), name = "Axe")
         )
+        //Создание адаптера
         adapter = ArrayAdapter(
             this,
             android.R.layout.simple_list_item_1,
@@ -49,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    // Создание слушателя
     private fun onAddPressed() {
         val dialogBinding = DialogAddCharacterBinding.inflate(layoutInflater)
         val dialog = AlertDialog.Builder(this)
@@ -73,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         adapter.add(character)
     }
 
+    // Удаление персонажа
     private fun deleteCharacter(character: Character) {
         val listener = DialogInterface.OnClickListener { dialog, which ->
             if (which == DialogInterface.BUTTON_POSITIVE) {
