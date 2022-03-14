@@ -1,56 +1,48 @@
 package ru.jonik.androidlearn
 
+import android.R
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.SimpleAdapter
 import androidx.appcompat.app.AlertDialog
 import ru.jonik.androidlearn.databinding.ActivityMainBinding
 import ru.jonik.androidlearn.databinding.DialogAddCharacterBinding
-import java.util.*
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: ArrayAdapter<Character>
+
+    private val data = mutableListOf(
+        Character(id = 1, name = "Sven", isCustom = false),
+        Character(id = 2, name = "Juggernaut", isCustom = false),
+        Character(id = 3, name = "Faceless void", isCustom = false),
+        Character(id = 4, name = "Axe", isCustom = false)
+    )
+
+    private lateinit var adapter: CharacterAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupListViewWithArrayAdapter()
+        setupList()
         binding.btnAdd.setOnClickListener { onAddPressed() }
-
     }
 
-
-    // Создание даты
-    private fun setupListViewWithArrayAdapter() {
-        val data = mutableListOf(
-            Character(id = UUID.randomUUID().toString(), name = "Sven"),
-            Character(id = UUID.randomUUID().toString(), name = "Juggernaut"),
-            Character(id = UUID.randomUUID().toString(), name = "Faceless void"),
-            Character(id = UUID.randomUUID().toString(), name = "Axe")
-        )
-        //Создание адаптера
-        adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_list_item_1,
-            android.R.id.text1,
-            data
-        )
+    private fun setupList() {
+        adapter = CharacterAdapter(data) {
+            deleteCharacter(it)
+        }
 
         binding.listView.adapter = adapter
 
         binding.listView.setOnItemClickListener { parent, view, position, id ->
-            adapter.getItem(position)?.let {
-                deleteCharacter(it)
-            }
+            showCharacterInfo(adapter.getItem(position))
         }
     }
+
 
     // Создание слушателя
     private fun onAddPressed() {
@@ -70,34 +62,38 @@ class MainActivity : AppCompatActivity() {
 
     private fun createCharacter(name: String) {
         val character = Character(
-            id = UUID.randomUUID().toString(),
-            name = name
+            id = Random.nextLong(),
+            name = name,
+            isCustom = true
         )
-        adapter.add(character)
+        data.add(character)
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun showCharacterInfo(character: Character) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(character.name)
+            .setMessage("Description: ${character.name}")
+            .setPositiveButton("Close") { _, _ -> }
+            .create()
+        dialog.show()
     }
 
     // Удаление персонажа
     private fun deleteCharacter(character: Character) {
         val listener = DialogInterface.OnClickListener { dialog, which ->
             if (which == DialogInterface.BUTTON_POSITIVE) {
-                adapter.remove(character)
+                data.remove(character)
+                adapter.notifyDataSetChanged()
             }
         }
         val dialog = AlertDialog.Builder(this)
             .setTitle("Delete character")
-            .setMessage("Delete the character: $character")
+            .setMessage("Delete the character ${character.name}")
             .setPositiveButton("Delete", listener)
             .setNegativeButton("Cancel", listener)
             .create()
         dialog.show()
     }
 
-    class Character(
-        val id: String,
-        val name: String
-    ) {
-        override fun toString(): String {
-            return name
-        }
-    }
 }
