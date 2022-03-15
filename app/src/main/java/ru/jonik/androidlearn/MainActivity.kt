@@ -1,6 +1,5 @@
 package ru.jonik.androidlearn
 
-import android.R
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +12,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    // Создание даты
     private val data = mutableListOf(
         Character(id = 1, name = "Sven", isCustom = false),
         Character(id = 2, name = "Juggernaut", isCustom = false),
@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // Функция создания персонажа
     private fun createCharacter(name: String) {
         val character = Character(
             id = Random.nextLong(),
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
+    // Функция показывающая информацию о персонаже при клике
     private fun showCharacterInfo(character: Character) {
         val dialog = AlertDialog.Builder(this)
             .setTitle(character.name)
