@@ -3,6 +3,8 @@ package ru.jonik.androidlearn
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import androidx.appcompat.app.AlertDialog
 import ru.jonik.androidlearn.databinding.ActivityMainBinding
 import ru.jonik.androidlearn.databinding.DialogAddCharacterBinding
@@ -37,9 +39,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.listView.adapter = adapter
+        binding.listView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val character = data[position]
+                binding.tvCharacterInfo.text = ("Description: ${character.name}, Id: ${character.id}")
+            }
 
-        binding.listView.setOnItemClickListener { parent, view, position, id ->
-            showCharacterInfo(adapter.getItem(position))
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
         }
     }
 
@@ -71,15 +78,6 @@ class MainActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    // Функция показывающая информацию о персонаже при клике
-    private fun showCharacterInfo(character: Character) {
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(character.name)
-            .setMessage("Description: ${character.name}")
-            .setPositiveButton("Close") { _, _ -> }
-            .create()
-        dialog.show()
-    }
 
     // Удаление персонажа
     private fun deleteCharacter(character: Character) {
