@@ -1,99 +1,50 @@
 package ru.jonik.androidlearn
 
-import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import androidx.appcompat.app.AlertDialog
+import android.os.PersistableBundle
+import androidx.appcompat.app.AppCompatActivity
 import ru.jonik.androidlearn.databinding.ActivityMainBinding
-import ru.jonik.androidlearn.databinding.DialogAddCharacterBinding
-import kotlin.random.Random
+import ru.jonik.androidlearn.model.Options
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // Создание даты
-    private val data = mutableListOf(
-        Character(id = 1, name = "Sven", isCustom = false),
-        Character(id = 2, name = "Juggernaut", isCustom = false),
-        Character(id = 3, name = "Faceless void", isCustom = false),
-        Character(id = 4, name = "Axe", isCustom = false)
-    )
-
-    private lateinit var adapter: CharacterAdapter
+    private lateinit var options: Options
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupList()
-        binding.btnAdd.setOnClickListener { onAddPressed() }
+        binding.btnOpenBox.setOnClickListener { onOpenBoxPressed() }
+        binding.btnOptions.setOnClickListener { onOptionsPressed() }
+        binding.btnAbout.setOnClickListener { onAboutPressed() }
+        binding.btnExit.setOnClickListener { onExitPressed() }
+
+//        options = savedInstanceState?.getParcelable(KEY_OPTIONS) ?: Options.DEFAULT
     }
 
-    private fun setupList() {
-        adapter = CharacterAdapter(data) {
-            deleteCharacter(it)
-        }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        outState.putParcelable(KEY_OPTIONS, options)
+//    }
 
-        binding.listView.adapter = adapter
-        binding.listView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(p0: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val character = data[position]
-                binding.tvCharacterInfo.text = ("Description: ${character.name}, Id: ${character.id}")
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
-        }
+    private fun onOpenBoxPressed() {
+        TODO("Not yet implemented")
     }
 
-
-    // Создание слушателя
-    private fun onAddPressed() {
-        val dialogBinding = DialogAddCharacterBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Create character")
-            .setView(dialogBinding.root)
-            .setPositiveButton("Add") { d, which ->
-                val name = dialogBinding.edCharacterName.text.toString()
-                if (name.isNotBlank()) {
-                    createCharacter(name)
-                }
-            }
-            .create()
-        dialog.show()
+    private fun onOptionsPressed() {
+        TODO("Not yet implemented")
     }
 
-    // Функция создания персонажа
-    private fun createCharacter(name: String) {
-        val character = Character(
-            id = Random.nextLong(),
-            name = name,
-            isCustom = true
-        )
-        data.add(character)
-        adapter.notifyDataSetChanged()
+    private fun onAboutPressed() {
+        startActivity(Intent(this, AboutActivity::class.java))
     }
 
-
-    // Удаление персонажа
-    private fun deleteCharacter(character: Character) {
-        val listener = DialogInterface.OnClickListener { dialog, which ->
-            if (which == DialogInterface.BUTTON_POSITIVE) {
-                data.remove(character)
-                adapter.notifyDataSetChanged()
-            }
-        }
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Delete character")
-            .setMessage("Delete the character ${character.name}")
-            .setPositiveButton("Delete", listener)
-            .setNegativeButton("Cancel", listener)
-            .create()
-        dialog.show()
+    // Завершение текущей активити (Т.к она стартовая, то приложение закрывается)
+    private fun onExitPressed() {
+        finish()
     }
-
 }

@@ -3,38 +3,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#7b917b">
 
-    <Spinner
-        android:id="@+id/listView"
-        android:layout_width="0dp"
+    <Button
+        android:id="@+id/btn_openBox"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="244dp"
+        android:text="@string/open_box"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_characterInfo"
+    <Button
+        android:id="@+id/btn_exit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:layout_marginStart="12dp"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listView" />
+        android:layout_marginTop="24dp"
+        android:text="@string/exit"
+        app:layout_constraintEnd_toEndOf="@+id/btn_about"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_about"
+        app:layout_constraintTop_toBottomOf="@+id/btn_about" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_add"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/btn_about"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        android:clickable="true"
-        android:contentDescription="@string/add"
-        android:focusable="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:layout_marginTop="12dp"
+        android:text="@string/about"
+        app:layout_constraintEnd_toEndOf="@+id/btn_options"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_options"
+        app:layout_constraintTop_toBottomOf="@+id/btn_options" />
+
+    <Button
+        android:id="@+id/btn_options"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/options"
+        app:layout_constraintEnd_toEndOf="@+id/btn_openBox"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/btn_openBox"
+        app:layout_constraintTop_toBottomOf="@+id/btn_openBox" />
 </androidx.constraintlayout.widget.ConstraintLayout>
