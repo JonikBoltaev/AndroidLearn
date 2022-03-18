@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AndroidLearn">
         <activity
+            android:name=".BoxSelectionActivity"
+            android:exported="false" />
+        <activity
             android:name=".OptionsActivity"
             android:exported="false" />
         <activity
