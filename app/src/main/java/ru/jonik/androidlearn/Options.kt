@@ -1,4 +1,4 @@
-package ru.jonik.androidlearn.model
+package ru.jonik.androidlearn
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

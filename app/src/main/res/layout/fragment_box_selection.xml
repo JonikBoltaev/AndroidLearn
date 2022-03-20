@@ -21,9 +21,10 @@
 
     <TextView
         android:id="@+id/selectBoxTextView"
+        style="@style/HintTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_a_box"
+        android:text="@string/please_select_a_box"
         app:layout_constraintVertical_bias="0.3"
         app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@id/beginGuideline"
@@ -48,6 +49,7 @@
 
     <TextView
         android:id="@+id/timerTextView"
+        style="@style/HintTextView.Value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
