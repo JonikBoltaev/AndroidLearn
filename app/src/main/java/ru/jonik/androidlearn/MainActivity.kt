@@ -1,177 +1,125 @@
 package ru.jonik.androidlearn
 
-import AboutFragment
-import BoxFragment
+import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Parcelable
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentResultListener
-import androidx.lifecycle.LifecycleOwner
 import ru.jonik.androidlearn.databinding.ActivityMainBinding
-import ru.jonik.androidlearn.fragments.BoxSelectionFragment
-import ru.jonik.androidlearn.fragments.MenuFragment
-import ru.jonik.androidlearn.fragments.contract.*
+import kotlin.properties.Delegates.notNull
 
-
-class MainActivity : AppCompatActivity(), Navigator {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val currentFragment: Fragment
-        get() = supportFragmentManager.findFragmentById(R.id.fragmentContainer)!!
-
-    private val fragmentListener = object : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            v: View,
-            savedInstanceState: Bundle?
-        ) {
-            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
-            updateUi()
-        }
-    }
+    private var volume by notNull<Int>()
+    private var color by notNull<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
-        setSupportActionBar(binding.toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragmentContainer, MenuFragment())
-                .commit()
-        }
-
-        supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentListener, false)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentListener)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        // we've called setSupportActionBar in onCreate,
-        // that's why we need to override this method too
+        binding.btnDefaultDialog.setOnClickListener { showAlertDialog() }
+        binding.btnSingleChoice.setOnClickListener { showSingleChoiceAlertDialog() }
+        binding.btnMultiChoice.setOnClickListener { showMultiChoiceAlertDialog() }
+        volume = savedInstanceState?.getInt(KEY_VOLUME) ?: 50
+        color = savedInstanceState?.getInt(KEY_COLOR) ?: Color.WHITE
         updateUi()
-        return true
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
-    }
-
-    override fun showBoxSelectionScreen(options: Options) {
-        launchFragment(BoxSelectionFragment.newInstance(options))
-    }
-
-    override fun showOptionsScreen(options: Options) {
-        launchFragment(OptionsFragment.newInstance(options))
-    }
-
-    override fun showCongratulationsScreen() {
-        launchFragment(BoxFragment())
-    }
-
-    override fun showAboutScreen() {
-        launchFragment(AboutFragment())
-    }
-
-    override fun goBack() {
-        onBackPressed()
-    }
-
-    override fun goToMenu() {
-        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    }
-
-    override fun <T : Parcelable> publishResult(result: T) {
-        supportFragmentManager.setFragmentResult(
-            result.javaClass.name,
-            bundleOf(KEY_RESULT to result)
+    private fun showMultiChoiceAlertDialog() {
+        val colorItems = resources.getStringArray(R.array.colors)
+        val colorComponents = mutableListOf(
+            Color.red(this.color),
+            Color.green(this.color),
+            Color.blue(this.color)
         )
+        val checkboxes = colorComponents
+            .map { it > 0 }
+            .toBooleanArray()
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Color setup")
+            .setMultiChoiceItems(colorItems, checkboxes) { _, which, isChecked ->
+                colorComponents[which] = if (isChecked) 255 else 0
+                this.color = Color.rgb(
+                    colorComponents[0],
+                    colorComponents[1],
+                    colorComponents[2]
+                )
+            }
+            .setPositiveButton("Confirm") { _, _ ->
+                this.color = color
+                updateUi()
+            }
+            .create()
+        dialog.show()
     }
 
-    override fun <T : Parcelable> listenResult(
-        clazz: Class<T>,
-        owner: LifecycleOwner,
-        listener: ResultListener<T>
-    ) {
-        supportFragmentManager.setFragmentResultListener(
-            clazz.name,
-            owner,
-            FragmentResultListener { key, bundle ->
-                listener.invoke(bundle.getParcelable(KEY_RESULT)!!)
-            })
-    }
-
-    private fun launchFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .setCustomAnimations(
-                R.anim.slide_in,
-                R.anim.fade_out,
-                R.anim.fade_in,
-                R.anim.slide_out
-            )
-            .addToBackStack(null)
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
+    private fun showSingleChoiceAlertDialog() {
+        val volumeItems = AvailableVolumeValues.createVolumeValues(volume)
+        val volumeTextItems = volumeItems.values
+            .map { getString(R.string.volume_description, it) }
+            .toTypedArray()
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Volume setup")
+            .setSingleChoiceItems(volumeTextItems, volumeItems.currentIndex) { dialog, which ->
+                volume = volumeItems.values[which]
+                updateUi()
+                dialog.dismiss()
+            }
+            .create()
+        dialog.show()
     }
 
     private fun updateUi() {
-        val fragment = currentFragment
-
-        if (fragment is HasCustomTitle) {
-            binding.toolbar.title = getString(fragment.getTitleRes())
-        } else {
-            binding.toolbar.title = getString(R.string.fragment_navigation_example)
-        }
-
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-        } else {
-            supportActionBar?.setDisplayHomeAsUpEnabled(false)
-            supportActionBar?.setDisplayShowHomeEnabled(false)
-        }
-
-        if (fragment is HasCustomAction) {
-            createCustomToolbarAction(fragment.getCustomAction())
-        } else {
-            binding.toolbar.menu.clear()
-        }
+        binding.tvVolume.text = getString(R.string.current_volume, volume)
+        binding.tvColor.setBackgroundColor(color)
     }
 
-    private fun createCustomToolbarAction(action: CustomAction) {
-        binding.toolbar.menu.clear() // clearing old action if it exists before assigning a new one
-
-        val iconDrawable = DrawableCompat.wrap(ContextCompat.getDrawable(this, action.iconRes)!!)
-        iconDrawable.setTint(Color.WHITE)
-
-        val menuItem = binding.toolbar.menu.add(action.textRes)
-        menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        menuItem.icon = iconDrawable
-        menuItem.setOnMenuItemClickListener {
-            action.onCustomAction.run()
-            return@setOnMenuItemClickListener true
+    private fun showAlertDialog() {
+        val listener = DialogInterface.OnClickListener { _, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> Toast.makeText(
+                    this,
+                    "Positive",
+                    Toast.LENGTH_SHORT
+                ).show()
+                DialogInterface.BUTTON_NEGATIVE -> Toast.makeText(
+                    this,
+                    "Negative",
+                    Toast.LENGTH_SHORT
+                ).show()
+                DialogInterface.BUTTON_NEUTRAL -> Toast.makeText(
+                    this,
+                    "Ignored",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
+        val dialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setIcon(R.mipmap.ic_launcher_round)
+            .setTitle(R.string.default_alert_Title)
+            .setMessage(R.string.default_alert_desc)
+            .setPositiveButton("YES", listener)
+            .setNegativeButton("NO", listener)
+            .setNeutralButton("Ignore", listener)
+            .setOnCancelListener {
+                Toast.makeText(this, "Canceled", Toast.LENGTH_SHORT).show()
+            }
+            .setOnDismissListener {
+                Toast.makeText(this, "Dismissed", Toast.LENGTH_SHORT).show()
+            }
+            .create()
+        dialog.show()
     }
 
     companion object {
         @JvmStatic
-        private val KEY_RESULT = "RESULT"
+        private val KEY_VOLUME = "KEY_VOLUME"
+
+        @JvmStatic
+        private val KEY_COLOR = "KEY_COLOR"
     }
 }
