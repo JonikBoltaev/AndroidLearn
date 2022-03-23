@@ -9,6 +9,9 @@
     <string name="volume_description">Volume: %1$d%%</string>
     <string name="current_volume">Current Volume: %1$d%%</string>
     <string name="multi_choice">Multi choice</string>
+    <string name="custom_view">Custom view</string>
+    <string name="volume_setup_with_validate">Volume setup with validate</string>
+    <string name="enter_volume">Enter volume</string>
     <string-array name="colors">
         <item>Red</item>
         <item>Green</item>

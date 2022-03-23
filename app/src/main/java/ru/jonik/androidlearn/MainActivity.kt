@@ -1,12 +1,17 @@
 package ru.jonik.androidlearn
 
+import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import ru.jonik.androidlearn.databinding.ActivityMainBinding
+import ru.jonik.androidlearn.databinding.CustomVolumeDialogBinding
+import ru.jonik.androidlearn.databinding.CustomVolumeValidateBinding
 import kotlin.properties.Delegates.notNull
 
 class MainActivity : AppCompatActivity() {
@@ -23,9 +28,75 @@ class MainActivity : AppCompatActivity() {
         binding.btnDefaultDialog.setOnClickListener { showAlertDialog() }
         binding.btnSingleChoice.setOnClickListener { showSingleChoiceAlertDialog() }
         binding.btnMultiChoice.setOnClickListener { showMultiChoiceAlertDialog() }
+        binding.btnCustom.setOnClickListener { showCustomAlertDialog() }
+        binding.btnValidate.setOnClickListener { showValidateAlertDialog() }
         volume = savedInstanceState?.getInt(KEY_VOLUME) ?: 50
         color = savedInstanceState?.getInt(KEY_COLOR) ?: Color.WHITE
         updateUi()
+    }
+
+    private fun showValidateAlertDialog() {
+        val dialogBinding = CustomVolumeValidateBinding.inflate(layoutInflater)
+        dialogBinding.edVolume.setText(volume.toString())
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Volume setup")
+            .setView(dialogBinding.root)
+            .setPositiveButton("Confirm", null)
+            .create()
+        dialog.setOnShowListener {
+            dialogBinding.edVolume.requestFocus()
+            showKeyboard(dialogBinding.edVolume)
+
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                val enteredText = dialogBinding.edVolume.text.toString()
+                if (enteredText.isBlank()) {
+                    dialogBinding.edVolume.error = "Value is empty"
+                    return@setOnClickListener
+                }
+                val volume = enteredText.toIntOrNull()
+                if (volume == null || volume > 100) {
+                    dialogBinding.edVolume.error = "Invalid value"
+                    return@setOnClickListener
+                }
+                this.volume = volume
+                updateUi()
+                dialog.dismiss()
+            }
+        }
+        dialog.setOnDismissListener { hideKeyboard(dialogBinding.edVolume) }
+        dialog.show()
+    }
+
+    private fun showKeyboard(view: View) {
+        view.post {
+            getInputMethodManager(view).showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+
+    private fun getInputMethodManager(view: View): InputMethodManager {
+        val context = view.context
+        return context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
+
+    private fun hideKeyboard(view: View) {
+        getInputMethodManager(view).hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    private fun showCustomAlertDialog() {
+        val dialogBinding = CustomVolumeDialogBinding.inflate(layoutInflater)
+        dialogBinding.volumeSeekBar.progress = volume
+        val dialog = AlertDialog.Builder(this)
+            .setCancelable(true)
+            .setTitle("Volume setup")
+            .setMessage("Specify volume")
+            .setView(dialogBinding.root)
+            .setPositiveButton("Confirm") { _, _ ->
+                volume = dialogBinding.volumeSeekBar.progress
+                updateUi()
+            }
+            .create()
+        dialog.show()
     }
 
     private fun showMultiChoiceAlertDialog() {
