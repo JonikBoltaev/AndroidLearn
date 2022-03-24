@@ -17,4 +17,16 @@
         <item>Green</item>
         <item>Blue</item>
     </string-array>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="green">Green</string>
+    <string name="purple">Purple</string>
+    <string name="green_fragment">Green Fragment</string>
+    <string name="go_back">Go Back</string>
+    <string name="go_secret">Go Secret</string>
+    <string name="generate_number">Generate number</string>
+    <string name="secret_fragment">Secret fragment</string>
+    <string name="go_root">Go Root</string>
+    <string name="this_is_a_fragment">This is a Fragment</string>
+    <string name="orange">orange</string>
+    <string name="aqua">Aqua</string>
 </resources>
