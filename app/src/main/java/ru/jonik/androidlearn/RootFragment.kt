@@ -2,6 +2,7 @@ package ru.jonik.androidlearn
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.core.os.bundleOf
@@ -17,22 +18,24 @@ class RootFragment : Fragment(R.layout.fragment_root) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentRootBinding.bind(view)
 
-        binding.btnGreen.setOnClickListener { openFragment(Color.rgb(123, 145, 123)) }
-        binding.btnAqua.setOnClickListener { openFragment(Color.rgb(127, 255, 212)) }
+        binding.btnGreen.setOnClickListener { openFragment(Color.rgb(123, 145, 123), "Green") }
+        binding.btnAqua.setOnClickListener { openFragment(Color.rgb(127, 255, 212), "Aqua") }
 
-        parentFragmentManager.setFragmentResultListener(
-            BoxFragment.REQUEST_CODE,
-            viewLifecycleOwner
-        ) { _, data ->
-            val number = data.getInt(BoxFragment.EXTRA_RANDOM_NUMBER)
-            Toast.makeText(requireContext(), "Generated number: $number", Toast.LENGTH_SHORT).show()
+        val liveData = findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Int>(BoxFragment.EXTRA_RANDOM_NUMBER)
+        liveData?.observe(viewLifecycleOwner) { randomNumber ->
+            if (randomNumber != null) {
+                Log.d("Jonik", "Generated random number: $randomNumber")
+                Toast.makeText(requireContext(), "Generated random number: $randomNumber", Toast.LENGTH_SHORT).show()
+                liveData.value = null
+            }
         }
     }
 
-    private fun openFragment(color: Int) {
-        findNavController().navigate(
-            R.id.action_rootFragment_to_boxFragment,
-            bundleOf(BoxFragment.ARG_COLOR to color)
-        )
+    private fun openFragment(color: Int, colorName: String) {
+
+        val directions = RootFragmentDirections.actionRootFragmentToBoxFragment(colorName, color)
+
+        findNavController().navigate(directions)
     }
 }
