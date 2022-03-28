@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import ru.jonik.androidlearn.databinding.FragmentRootBinding
 
+// TODO MVVM
 class RootFragment : Fragment(R.layout.fragment_root) {
 
     private lateinit var binding: FragmentRootBinding
@@ -26,7 +27,11 @@ class RootFragment : Fragment(R.layout.fragment_root) {
         liveData?.observe(viewLifecycleOwner) { randomNumber ->
             if (randomNumber != null) {
                 Log.d("Jonik", "Generated random number: $randomNumber")
-                Toast.makeText(requireContext(), "Generated random number: $randomNumber", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Generated random number: $randomNumber",
+                    Toast.LENGTH_SHORT
+                ).show()
                 liveData.value = null
             }
         }
@@ -36,6 +41,6 @@ class RootFragment : Fragment(R.layout.fragment_root) {
 
         val directions = RootFragmentDirections.actionRootFragmentToBoxFragment(colorName, color)
 
-        findNavController().navigate(directions)
+        findNavController().navigate(R.id.action_rootFragment_to_boxFragment)
     }
 }
